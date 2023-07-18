@@ -66,6 +66,7 @@ if TYPE_CHECKING:
 from urllib import parse, request
 
 import dulwich.porcelain
+import git
 
 from . import (
     AbstractRepoFetcher,
@@ -161,90 +162,19 @@ class GitFetcher(AbstractRepoFetcher):
         self.logger.debug(f"Repo dir {repo_tag_destdir}")
 
         # We are assuming that, if the directory does exist, it contains the repo
-        doRepoUpdate = True
         if not os.path.exists(os.path.join(repo_tag_destdir, ".git")):
-            # Try cloning the repository without initial checkout
-            if repoTag is not None:
-                gitclone_params = [
-                    self.git_cmd,
-                    "clone",
-                    "-n",
-                    "--recurse-submodules",
-                    repoURL,
-                    repo_tag_destdir,
-                ]
-
+                # if we know the tag/branch try cloning the repository without initial checkout
                 # Now, checkout the specific commit
-                gitcheckout_params = [self.git_cmd, "checkout", repoTag]
-            else:
-                # We know nothing about the tag, or checkout
-                gitclone_params = [
-                    self.git_cmd,
-                    "clone",
-                    "--recurse-submodules",
-                    repoURL,
-                    repo_tag_destdir,
-                ]
-
-                gitcheckout_params = None
+            
+                # else just checkout main if we know nothing about the tag, or checkout
+            pass
+                
         elif doUpdate:
-            gitclone_params = None
-            gitcheckout_params = [self.git_cmd, "pull", "--recurse-submodules"]
-            if repoTag is not None:
-                gitcheckout_params.extend(["origin", repoTag])
-        else:
-            doRepoUpdate = False
+            # git pull with recursive submodules
+            # if a tag/branch is given, append origin repoTag to the command
+            pass
 
-        if doRepoUpdate:
-            with tempfile.NamedTemporaryFile() as git_stdout, tempfile.NamedTemporaryFile() as git_stderr:
-                # First, (bare) clone
-                retval = 0
-                if gitclone_params is not None:
-                    self.logger.debug(f'Running "{" ".join(gitclone_params)}"')
-                    retval = subprocess.call(
-                        gitclone_params, stdout=git_stdout, stderr=git_stderr
-                    )
-                # Then, checkout (which can be optional)
-                if retval == 0 and (gitcheckout_params is not None):
-                    self.logger.debug(f'Running "{" ".join(gitcheckout_params)}"')
-                    retval = subprocess.Popen(
-                        gitcheckout_params,
-                        stdout=git_stdout,
-                        stderr=git_stderr,
-                        cwd=repo_tag_destdir,
-                    ).wait()
-                # Last, submodule preparation
-                if retval == 0:
-                    # Last, initialize submodules
-                    gitsubmodule_params = [
-                        self.git_cmd,
-                        "submodule",
-                        "update",
-                        "--init",
-                        "--recursive",
-                    ]
-
-                    self.logger.debug(f'Running "{" ".join(gitsubmodule_params)}"')
-                    retval = subprocess.Popen(
-                        gitsubmodule_params,
-                        stdout=git_stdout,
-                        stderr=git_stderr,
-                        cwd=repo_tag_destdir,
-                    ).wait()
-
-                # Proper error handling
-                if retval != 0:
-                    # Reading the output and error for the report
-                    with open(git_stdout.name, "r") as c_stF:
-                        git_stdout_v = c_stF.read()
-                    with open(git_stderr.name, "r") as c_stF:
-                        git_stderr_v = c_stF.read()
-
-                    errstr = "ERROR: Unable to pull '{}' (tag '{}'). Retval {}\n======\nSTDOUT\n======\n{}\n======\nSTDERR\n======\n{}".format(
-                        repoURL, repoTag, retval, git_stdout_v, git_stderr_v
-                    )
-                    raise FetcherException(errstr)
-
+        
         # Last, we have to obtain the effective checkout
         gitrevparse_params = [self.git_cmd, "rev-parse", "--verify", "HEAD"]
 
