@@ -125,8 +125,9 @@ class GitFetcher(AbstractRepoFetcher):
     ) -> "Tuple[AbsPath, RepoDesc, Sequence[URIWithMetadata]]":
         """
 
-        :param repoURL:
-        :param repoTag:
+        :param repoURL: The URL to the repository.
+        :param repoTag: The tag or branch to checkout.
+        By default, checkout the repository's default branch.
         :param doUpdate:
         :return:
         """
@@ -162,16 +163,40 @@ class GitFetcher(AbstractRepoFetcher):
         self.logger.debug(f"Repo dir {repo_tag_destdir}")
 
         # We are assuming that, if the directory does exist, it contains the repo
+        repo = git.Repo()
         if not os.path.exists(os.path.join(repo_tag_destdir, ".git")):
+            if repoTag is not None:
                 # if we know the tag/branch try cloning the repository without initial checkout
+                repo = repo.clone_from(
+                    repoURL,
+                    repo_tag_destdir,
+                    multi_options=["--recurse-submodules", "-n"]
+                )
                 # Now, checkout the specific commit
+                if repoTag in repo.refs:
+                    repo.refs[repoTag].checkout()
+                elif repoTag in repo.remotes.origin.refs:
+                    repo.remotes.origin.refs[repoTag].checkout()
+                else:
+                    self.logger.info(
+                        f"Unable to checkout {repoTag}. "
+                        f"No such branch or tag. Defaulting to {repo.active_branch.name}."
+                    )
             
-                # else just checkout main if we know nothing about the tag, or checkout
-            pass
+            # else just checkout main if we know nothing about the tag, or checkout
+            else:
+                repo = repo.clone_from(
+                    repoURL,
+                    repo_tag_destdir,
+                    multi_options=["--recurse-submodules"]
+                )
                 
         elif doUpdate:
             # git pull with recursive submodules
             # if a tag/branch is given, append origin repoTag to the command
+            pass
+
+        else:
             pass
 
         
