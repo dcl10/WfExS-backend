@@ -213,18 +213,8 @@ class GitFetcher(AbstractRepoFetcher):
         # Last, we have to obtain the effective checkout
         gitrevparse_params = [self.git_cmd, "rev-parse", "--verify", "HEAD"]
 
-        self.logger.debug(f'Running "{" ".join(gitrevparse_params)}"')
-        with subprocess.Popen(
-            gitrevparse_params,
-            stdout=subprocess.PIPE,
-            encoding="iso-8859-1",
-            cwd=repo_tag_destdir,
-        ) as revproc:
-            if revproc.stdout is not None:
-                repo_effective_checkout = cast(
-                    "RepoTag", revproc.stdout.read().rstrip()
-                )
-
+        checkout = repo.git.execute(gitrevparse_params)
+        repo_effective_checkout = cast("RepoTag", checkout)
         repo_desc: "RepoDesc" = {
             "repo": repoURL,
             "tag": repoTag,
