@@ -176,7 +176,7 @@ class GitFetcher(AbstractRepoFetcher):
                 if repoTag in repo.refs:
                     repo.refs[repoTag].checkout()
                 elif repoTag in repo.remotes.origin.refs:
-                    repo.remotes.origin.refs[repoTag].checkout()
+                    repo.remote().refs[repoTag].checkout()
                 else:
                     self.logger.info(
                         f"Unable to checkout {repoTag}. "
@@ -193,8 +193,18 @@ class GitFetcher(AbstractRepoFetcher):
                 
         elif doUpdate:
             # git pull with recursive submodules
-            # if a tag/branch is given, append origin repoTag to the command
-            pass
+            repo = git.Repo(os.path.join(repo_tag_destdir, ".git"))
+            if repoTag is not None:
+                if repoTag in repo.refs:
+                    repo.refs[repoTag].checkout()
+                elif repoTag in repo.remotes.origin.refs:
+                    repo.remote().refs[repoTag].checkout()
+                else:
+                    self.logger.info(
+                        f"Unable to checkout {repoTag}. "
+                        f"No such branch or tag. Defaulting to {repo.active_branch.name}."
+                    )
+            repo.remote().pull(repoTag)
 
         else:
             pass
