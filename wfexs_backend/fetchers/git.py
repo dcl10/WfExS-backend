@@ -334,16 +334,15 @@ def guess_git_repo_params(
     try:
         if parsed_wf_url.scheme in GitFetcher.GetSchemeHandlers():
             # Getting the scheme git is going to understand
-            if len(parsed_wf_url.scheme) >= len(GitFetcher.GIT_PROTO_PREFIX):
-                gitScheme = parsed_wf_url.scheme[len(GitFetcher.GIT_PROTO_PREFIX) :]
+            if parsed_wf_url.scheme.startswith(GitFetcher.GIT_PROTO_PREFIX):
+                gitScheme = parsed_wf_url.scheme.replace(GitFetcher.GIT_PROTO_PREFIX, "")
             else:
                 gitScheme = parsed_wf_url.scheme
 
             # Getting the tag or branch
+            gitPath = parsed_wf_url.path
             if "@" in parsed_wf_url.path:
                 gitPath, repoTag = parsed_wf_url.path.split("@", 1)
-            else:
-                gitPath = parsed_wf_url.path
 
             # Getting the repoRelPath (if available)
             if len(parsed_wf_url.fragment) > 0:
