@@ -488,9 +488,7 @@ def find_git_repo_in_uri(
         parsedInputURL = parse.urlparse(remote_file)
     sp_path = parsedInputURL.path.split("/")
 
-    shortest_pre_path: "Optional[URIType]" = None
     longest_post_path: "Optional[Sequence[str]]" = None
-    repo_type: "Optional[RepoType]" = None
     the_remote_uri: "Optional[str]" = None
     b_default_repo_tag: "Optional[str]" = None
     repo_branches: "Optional[MutableSequence[RepoTag]]" = None
@@ -522,41 +520,7 @@ def find_git_repo_in_uri(
                     b_default_repo_tag = b_repo_tag
 
         # It is considered a git repo!
-        shortest_pre_path = cast("URIType", pre_path)
         longest_post_path = sp_path[pos:]
-        if repo_type is None:
-            # Metadata is all we really need
-            repo_type = RepoType.Raw
-            req = request.Request(remote_uri_anc, method="HEAD")
-            try:
-                with request.urlopen(req) as resp:
-                    # Is it gitlab?
-                    if list(
-                        filter(
-                            lambda c: "gitlab" in c,
-                            resp.headers.get_all("Set-Cookie"),
-                        )
-                    ):
-                        repo_type = RepoType.GitLab
-                    elif list(
-                        filter(
-                            lambda c: GITHUB_NETLOC in c,
-                            resp.headers.get_all("Set-Cookie"),
-                        )
-                    ):
-                        repo_type = RepoType.GitHub
-                    elif list(
-                        filter(
-                            lambda c: "bitbucket" in c,
-                            resp.headers.get_all("X-View-Name"),
-                        )
-                    ):
-                        repo_type = RepoType.BitBucket
-            except Exception as e:
-                pass
-
-    if repo_type is None:
-        raise RepoGuessException(f"Unable to identify {remote_file} as a git repo")
 
     if b_default_repo_tag is None:
         raise RepoGuessException(
@@ -569,6 +533,6 @@ def find_git_repo_in_uri(
     repo = RemoteRepo(
         repo_url=cast("RepoURL", the_remote_uri),
         tag=cast("RepoTag", b_default_repo_tag),
-        repo_type=repo_type,
+        repo_type=RepoType.Git,
     )
     return repo, longest_post_path, repo_branches
