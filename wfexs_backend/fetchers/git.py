@@ -170,34 +170,32 @@ class GitFetcher(AbstractRepoFetcher):
                 repo = repo.clone_from(
                     repoURL,
                     repo_tag_destdir,
-                    multi_options=["--recurse-submodules", "-n"]
+                    multi_options=["--recurse-submodules", "-n"],
                 )
                 # Now, checkout the specific commit
                 if repoTag in repo.refs:
                     repo.refs[repoTag].checkout()
-                elif repoTag in repo.remotes.origin.refs:
+                elif repoTag in repo.remote().refs:
                     repo.remote().refs[repoTag].checkout()
                 else:
                     self.logger.info(
                         f"Unable to checkout {repoTag}. "
                         f"No such branch or tag. Defaulting to {repo.active_branch.name}."
                     )
-            
+
             # else just checkout main if we know nothing about the tag, or checkout
             else:
                 repo = repo.clone_from(
-                    repoURL,
-                    repo_tag_destdir,
-                    multi_options=["--recurse-submodules"]
+                    repoURL, repo_tag_destdir, multi_options=["--recurse-submodules"]
                 )
-                
+
         elif doUpdate:
             # git pull with recursive submodules
             repo = git.Repo(os.path.join(repo_tag_destdir, ".git"))
             if repoTag is not None:
                 if repoTag in repo.refs:
                     repo.refs[repoTag].checkout()
-                elif repoTag in repo.remotes.origin.refs:
+                elif repoTag in repo.remote().refs:
                     repo.remote().refs[repoTag].checkout()
                 else:
                     self.logger.info(
@@ -209,7 +207,6 @@ class GitFetcher(AbstractRepoFetcher):
         else:
             pass
 
-        
         # Last, we have to obtain the effective checkout
         gitrevparse_params = [self.git_cmd, "rev-parse", "--verify", "HEAD"]
 
@@ -317,6 +314,27 @@ def guess_git_repo_params(
     logger: "logging.Logger",
     fail_ok: "bool" = False,
 ) -> "Optional[RemoteRepo]":
+    """Guess the git repo parameters from the given URL. This works git repos hosted
+    on GitHub, GitLab, Bitbucket, etc.
+
+    The scheme is ignored and the repo is fetched over HTTPS.
+
+    e.g. "git+https://github.com/example.git@0.1.2#subdirectory=workflows" gives:
+
+    ```python
+    RemoteRepo(
+        repo_url="https://github.com/example.git",
+        tag="0.1.2",
+        rel_path="workflows",
+        repo_type="git",
+    )
+    ```
+
+    :param wf_url: _description_
+    :param logger: _description_
+    :param fail_ok: _description_, defaults to False
+    :return: _description_
+    """
     repoURL = None
     repoTag = None
     repoRelPath = None
@@ -328,139 +346,24 @@ def guess_git_repo_params(
     else:
         parsed_wf_url = parse.urlparse(wf_url)
 
-    # These are the usual URIs which can be understood by pip
-    # See https://pip.pypa.io/en/stable/cli/pip_install/#git
-    found_params: "Optional[Tuple[RemoteRepo, Sequence[str], Sequence[RepoTag]]]" = None
-    try:
-        if parsed_wf_url.scheme in GitFetcher.GetSchemeHandlers():
-            # Getting the scheme git is going to understand
-            if parsed_wf_url.scheme.startswith(GitFetcher.GIT_PROTO_PREFIX):
-                gitScheme = parsed_wf_url.scheme.replace(GitFetcher.GIT_PROTO_PREFIX, "")
-            else:
-                gitScheme = parsed_wf_url.scheme
+    # Getting the scheme git is going to understand
+    if parsed_wf_url.scheme != "https":
+        gitScheme = "https"
 
-            # Getting the tag or branch
-            gitPath = parsed_wf_url.path
-            if "@" in parsed_wf_url.path:
-                gitPath, repoTag = parsed_wf_url.path.split("@", 1)
+    # Getting the tag or branch
+    gitPath = parsed_wf_url.path
+    if "@" in parsed_wf_url.path:
+        gitPath, repoTag = parsed_wf_url.path.split("@", 1)
 
-            # Getting the repoRelPath (if available)
-            if len(parsed_wf_url.fragment) > 0:
-                frag_qs = parse.parse_qs(parsed_wf_url.fragment)
-                subDirArr = frag_qs.get("subdirectory", [])
-                if len(subDirArr) > 0:
-                    repoRelPath = subDirArr[0]
+    # Getting the repoRelPath (if available)
+    if parsed_wf_url.fragment:
+        frag_qs = parse.parse_qs(parsed_wf_url.fragment)
+        subDirArr = frag_qs.get("subdirectory", [])
+        if len(subDirArr) > 0:
+            repoRelPath = subDirArr[0]
 
-            # Now, reassemble the repoURL
-            repoURL = parse.urlunparse(
-                (gitScheme, parsed_wf_url.netloc, gitPath, "", "", "")
-            )
-            found_params = find_git_repo_in_uri(cast("URIType", repoURL))
-
-        elif parsed_wf_url.scheme == GITHUB_SCHEME:
-            repoType = RepoType.GitHub
-
-            gh_path_split = parsed_wf_url.path.split("/")
-            gh_path = "/".join(gh_path_split[:2])
-            gh_post_path = list(map(parse.unquote_plus, gh_path_split[2:]))
-            if len(gh_post_path) > 0:
-                repoTag = gh_post_path[0]
-                if len(gh_post_path) > 1:
-                    repoRelPath = "/".join(gh_post_path[1:])
-
-            repoURL = parse.urlunparse(
-                parse.ParseResult(
-                    scheme="https",
-                    netloc=GITHUB_NETLOC,
-                    path=gh_path,
-                    params="",
-                    query="",
-                    fragment="",
-                )
-            )
-            found_params = find_git_repo_in_uri(cast("URIType", repoURL))
-
-        elif parsed_wf_url.netloc == GITHUB_NETLOC:
-            found_params = find_git_repo_in_uri(parsed_wf_url)
-            repoURL = found_params[0].repo_url
-
-            # And now, guessing the tag and the relative path
-            # WARNING! This code can have problems with tags which contain slashes
-            wf_path = found_params[1]
-            repo_branches_tags = found_params[2]
-            if len(wf_path) > 1 and (wf_path[0] in ("blob", "tree")):
-                wf_path_tag = list(map(parse.unquote_plus, wf_path[1:]))
-
-                tag_relpath = "/".join(wf_path_tag)
-                for repo_branch_tag in repo_branches_tags:
-                    if repo_branch_tag == tag_relpath or tag_relpath.startswith(
-                        repo_branch_tag + "/"
-                    ):
-                        repoTag = repo_branch_tag
-                        if len(tag_relpath) > len(repo_branch_tag):
-                            tag_relpath = tag_relpath[len(repo_branch_tag) + 1 :]
-                            if len(tag_relpath) > 0:
-                                repoRelPath = tag_relpath
-                        break
-                else:
-                    # Fallback
-                    repoTag = wf_path_tag[0]
-                    if len(wf_path_tag) > 0:
-                        repoRelPath = "/".join(wf_path_tag[1:])
-        elif parsed_wf_url.netloc == "raw.githubusercontent.com":
-            wf_path = list(map(parse.unquote_plus, parsed_wf_url.path.split("/")))
-            if len(wf_path) >= 3:
-                # Rebuilding it
-                repoGitPath = wf_path[:3]
-                repoGitPath[-1] += ".git"
-
-                # Rebuilding repo git path
-                repoURL = parse.urlunparse(
-                    ("https", GITHUB_NETLOC, "/".join(repoGitPath), "", "", "")
-                )
-
-                # And now, guessing the tag/checkout and the relative path
-                # WARNING! This code can have problems with tags which contain slashes
-                found_params = find_git_repo_in_uri(cast("URIType", repoURL))
-                if len(wf_path) >= 4:
-                    repo_branches_tags = found_params[2]
-                    # Validate against existing branch and tag names
-                    tag_relpath = "/".join(wf_path[3:])
-                    for repo_branch_tag in repo_branches_tags:
-                        if repo_branch_tag == tag_relpath or tag_relpath.startswith(
-                            repo_branch_tag + "/"
-                        ):
-                            repoTag = repo_branch_tag
-                            if len(tag_relpath) > len(repo_branch_tag):
-                                tag_relpath = tag_relpath[len(repo_branch_tag) + 1 :]
-                                if len(tag_relpath) > 0:
-                                    repoRelPath = tag_relpath
-                            break
-                    else:
-                        # Fallback
-                        repoTag = wf_path[3]
-                        if len(wf_path) > 4:
-                            repoRelPath = "/".join(wf_path[4:])
-            else:
-                repoType = RepoType.GitHub
-        # TODO handling other popular cases, like bitbucket
-        else:
-            found_params = find_git_repo_in_uri(parsed_wf_url)
-
-    except RepoGuessException as gge:
-        if not fail_ok:
-            raise FetcherException(
-                f"FIXME: Unsupported http(s) git repository {wf_url} (see cascade exception)"
-            ) from gge
-
-    if found_params is not None:
-        if repoTag is None:
-            repoTag = found_params[0].tag
-        repoType = found_params[0].repo_type
-    elif not fail_ok:
-        raise FetcherException(
-            "FIXME: Unsupported http(s) git repository {}".format(wf_url)
-        )
+    # Now, reassemble the repoURL
+    repoURL = parse.urlunparse((gitScheme, parsed_wf_url.netloc, gitPath, "", "", ""))
 
     logger.debug(
         "From {} was derived (type {}) {} {} {}".format(
