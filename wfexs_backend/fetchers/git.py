@@ -307,6 +307,7 @@ class GitFetcher(AbstractRepoFetcher):
 HEAD_LABEL = b"HEAD"
 REFS_HEADS_PREFIX = b"refs/heads/"
 REFS_TAGS_PREFIX = b"refs/tags/"
+GIT_SCHEMES = ["https", "git+https", "ssh", "git+ssh", "file", "git+file"]
 
 
 def guess_git_repo_params(
@@ -317,19 +318,6 @@ def guess_git_repo_params(
     """Guess the git repo parameters from the given URL. This works git repos hosted
     on GitHub, GitLab, Bitbucket, etc.
 
-    The scheme is ignored and the repo is fetched over HTTPS.
-
-    e.g. "git+https://github.com/example.git@0.1.2#subdirectory=workflows" gives:
-
-    ```python
-    RemoteRepo(
-        repo_url="https://github.com/example.git",
-        tag="0.1.2",
-        rel_path="workflows",
-        repo_type="git",
-    )
-    ```
-
     :param wf_url: _description_
     :param logger: _description_
     :param fail_ok: _description_, defaults to False
@@ -338,7 +326,7 @@ def guess_git_repo_params(
     repoURL = None
     repoTag = None
     repoRelPath = None
-    repoType: "Optional[RepoType]" = None
+    repoType: "Optional[RepoType]" = RepoType.Git
 
     # Deciding which is the input
     if isinstance(wf_url, parse.ParseResult):
@@ -346,9 +334,15 @@ def guess_git_repo_params(
     else:
         parsed_wf_url = parse.urlparse(wf_url)
 
+    # Raise if no scheme in URL. Can't choose how to proceed
+    if not parsed_wf_url.scheme:
+        logger.info(
+            f"No scheme in repo URL. Choices are: {', '.join(GIT_SCHEMES)}"
+        )
+        return None
+
     # Getting the scheme git is going to understand
-    if parsed_wf_url.scheme != "https":
-        gitScheme = "https"
+    git_scheme = parsed_wf_url.scheme.removeprefix("git+")
 
     # Getting the tag or branch
     gitPath = parsed_wf_url.path
@@ -359,20 +353,20 @@ def guess_git_repo_params(
     if parsed_wf_url.fragment:
         frag_qs = parse.parse_qs(parsed_wf_url.fragment)
         subDirArr = frag_qs.get("subdirectory", [])
-        if len(subDirArr) > 0:
+        if subDirArr:
             repoRelPath = subDirArr[0]
 
     # Now, reassemble the repoURL
-    repoURL = parse.urlunparse((gitScheme, parsed_wf_url.netloc, gitPath, "", "", ""))
+    if git_scheme == "ssh":
+        repoURL = parsed_wf_url.netloc + parsed_wf_url.path
+    else:
+        repoURL = parse.urlunparse((git_scheme, parsed_wf_url.netloc, gitPath, "", "", ""))
 
     logger.debug(
         "From {} was derived (type {}) {} {} {}".format(
             wf_url, repoType, repoURL, repoTag, repoRelPath
         )
     )
-
-    if repoURL is None:
-        return None
 
     return RemoteRepo(
         repo_url=cast("RepoURL", repoURL),
