@@ -110,5 +110,4 @@ from wfexs_backend.fetchers.git import guess_git_repo_params
 def test_guess_git_repo_params(url, expected):
     logger = logging.Logger("name")
     output = guess_git_repo_params(url, logger=logger)
-    print(output)
     assert output == expected
