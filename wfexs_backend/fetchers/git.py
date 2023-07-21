@@ -288,26 +288,29 @@ class GitFetcher(AbstractRepoFetcher):
             raise FetcherException(f"FIXME: Unhandled scheme {parsedInputURL.scheme}")
 
         # Getting the scheme git is going to understand
-        if parsedInputURL.scheme.startswith(self.GIT_PROTO_PREFIX):
-            gitScheme = parsedInputURL.scheme.replace(self.GIT_PROTO_PREFIX, "")
+        if len(parsedInputURL.scheme) >= len(self.GIT_PROTO_PREFIX):
+            gitScheme = parsedInputURL.scheme[len(self.GIT_PROTO_PREFIX) :]
         else:
             gitScheme = parsedInputURL.scheme
 
         # Getting the tag or branch
-        gitPath = parsedInputURL.path
-        repoTag: "Optional[RepoTag]" = None
+        repoTag: "Optional[RepoTag]"
         if "@" in parsedInputURL.path:
             gitPath, repoTag = cast(
                 "Tuple[str, RepoTag]", tuple(parsedInputURL.path.split("@", 1))
             )
+        else:
+            gitPath = parsedInputURL.path
+            repoTag = None
 
         # Getting the repoRelPath (if available)
-        repoRelPath = None
         if len(parsedInputURL.fragment) > 0:
             frag_qs = parse.parse_qs(parsedInputURL.fragment)
             subDirArr = frag_qs.get("subdirectory", [])
             if len(subDirArr) > 0:
                 repoRelPath = subDirArr[0]
+        else:
+            repoRelPath = None
 
         # Now, reassemble the repoURL, to be used by git client
         repoURL = cast(
