@@ -30,6 +30,14 @@ from wfexs_backend.fetchers.git import guess_git_repo_params
             ),
         ),
         (
+            "https://github.com/inab/WfExS-backend.git#subdirectory=workflow_examples/ipc/cosifer_test1_cwl.wfex.stage",
+            RemoteRepo(
+                repo_url="https://github.com/inab/WfExS-backend.git",
+                repo_type=RepoType.Git,
+                rel_path="workflow_examples/ipc/cosifer_test1_cwl.wfex.stage",
+            ),
+        ),
+        (
             "ssh://git@github.com:inab/WfExS-backend.git",
             RemoteRepo(
                 repo_url="git@github.com:inab/WfExS-backend.git",
@@ -52,6 +60,14 @@ from wfexs_backend.fetchers.git import guess_git_repo_params
             ),
         ),
         (
+            "ssh://git@github.com:inab/WfExS-backend.git#subdirectory=workflow_examples/ipc/cosifer_test1_cwl.wfex.stage",
+            RemoteRepo(
+                repo_url="git@github.com:inab/WfExS-backend.git",
+                repo_type=RepoType.Git,
+                rel_path="workflow_examples/ipc/cosifer_test1_cwl.wfex.stage",
+            ),
+        ),
+        (
             "github.com/inab/WfExS-backend.git",
             None,
         ),
@@ -62,5 +78,7 @@ from wfexs_backend.fetchers.git import guess_git_repo_params
     ],
 )
 def test_guess_git_repo_params(url, expected):
-    output = guess_git_repo_params(url, logger=logging.Logger("name"))
+    logger = logging.Logger("name")
+    output = guess_git_repo_params(url, logger=logger)
+    print(output)
     assert output == expected
