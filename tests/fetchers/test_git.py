@@ -22,6 +22,14 @@ from wfexs_backend.fetchers.git import guess_git_repo_params
             ),
         ),
         (
+            "https://github.com/inab/WfExS-backend.git@0.1.2",
+            RemoteRepo(
+                repo_url="https://github.com/inab/WfExS-backend.git",
+                repo_type=RepoType.Git,
+                tag="0.1.2",
+            ),
+        ),
+        (
             "ssh://git@github.com:inab/WfExS-backend.git",
             RemoteRepo(
                 repo_url="git@github.com:inab/WfExS-backend.git",
@@ -33,6 +41,14 @@ from wfexs_backend.fetchers.git import guess_git_repo_params
             RemoteRepo(
                 repo_url="git@github.com:inab/WfExS-backend.git",
                 repo_type=RepoType.Git,
+            ),
+        ),
+        (
+            "ssh://git@github.com:inab/WfExS-backend.git@0.1.2",
+            RemoteRepo(
+                repo_url="git@github.com:inab/WfExS-backend.git",
+                repo_type=RepoType.Git,
+                tag="0.1.2"
             ),
         ),
         (

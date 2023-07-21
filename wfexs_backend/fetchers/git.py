@@ -358,7 +358,7 @@ def guess_git_repo_params(
 
     # Now, reassemble the repoURL
     if git_scheme == "ssh":
-        repoURL = parsed_wf_url.netloc + parsed_wf_url.path
+        repoURL = parsed_wf_url.netloc + gitPath
     else:
         repoURL = parse.urlunparse((git_scheme, parsed_wf_url.netloc, gitPath, "", "", ""))
 
