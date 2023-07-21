@@ -56,7 +56,7 @@ from wfexs_backend.fetchers.git import guess_git_repo_params
             RemoteRepo(
                 repo_url="git@github.com:inab/WfExS-backend.git",
                 repo_type=RepoType.Git,
-                tag="0.1.2"
+                tag="0.1.2",
             ),
         ),
         (
