@@ -315,13 +315,16 @@ def guess_git_repo_params(
     logger: "logging.Logger",
     fail_ok: "bool" = False,
 ) -> "Optional[RemoteRepo]":
-    """Guess the git repo parameters from the given URL. This works git repos hosted
-    on GitHub, GitLab, Bitbucket, etc.
+    """Extract the parameters for a git repo from the given URL. If an invalid URL is passed,
+    this function returns `None`.
+    
+    The acceptable form for the URL can be found [here](https://pip.pypa.io/en/stable/topics/vcs-support/#git).
 
-    :param wf_url: _description_
-    :param logger: _description_
-    :param fail_ok: _description_, defaults to False
-    :return: _description_
+    :param wf_url: The URL to the repo.
+    :param logger: A `logging.Logger` instance for debugging purposes.
+    :param fail_ok: _description_, defaults to False. Deprecated, ignored.
+    :return: A `RemoteRepo` instance containing parameters of the git repo or `None`
+    if no repo was found.
     """
     repoURL = None
     repoTag = None
@@ -336,14 +339,14 @@ def guess_git_repo_params(
 
     # Return None if no scheme in URL. Can't choose how to proceed
     if not parsed_wf_url.scheme:
-        logger.info(
+        logger.debug(
             f"No scheme in repo URL. Choices are: {', '.join(GIT_SCHEMES)}"
         )
         return None
     
     # Return None if no scheme in URL. Can't choose how to proceed
     if not ".git" in parsed_wf_url.path:
-        logger.info(
+        logger.debug(
             f"URL does not seem to point to a git repo."
         )
         return None
