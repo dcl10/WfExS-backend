@@ -68,6 +68,36 @@ from wfexs_backend.fetchers.git import guess_git_repo_params
             ),
         ),
         (
+            "file:///inab/WfExS-backend/.git",
+            RemoteRepo(
+                repo_url="file:///inab/WfExS-backend/.git",
+                repo_type=RepoType.Git,
+            ),
+        ),
+        (
+            "git+file:///inab/WfExS-backend/.git",
+            RemoteRepo(
+                repo_url="file:///inab/WfExS-backend/.git",
+                repo_type=RepoType.Git,
+            ),
+        ),
+        (
+            "file:///inab/WfExS-backend/.git@0.1.2",
+            RemoteRepo(
+                repo_url="file:///inab/WfExS-backend/.git",
+                repo_type=RepoType.Git,
+                tag="0.1.2",
+            ),
+        ),
+        (
+            "file:///inab/WfExS-backend/.git#subdirectory=workflow_examples/ipc/cosifer_test1_cwl.wfex.stage",
+            RemoteRepo(
+                repo_url="file:///inab/WfExS-backend/.git",
+                repo_type=RepoType.Git,
+                rel_path="workflow_examples/ipc/cosifer_test1_cwl.wfex.stage",
+            ),
+        ),
+        (
             "github.com/inab/WfExS-backend.git",
             None,
         ),
