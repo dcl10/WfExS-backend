@@ -334,10 +334,17 @@ def guess_git_repo_params(
     else:
         parsed_wf_url = parse.urlparse(wf_url)
 
-    # Raise if no scheme in URL. Can't choose how to proceed
+    # Return None if no scheme in URL. Can't choose how to proceed
     if not parsed_wf_url.scheme:
         logger.info(
             f"No scheme in repo URL. Choices are: {', '.join(GIT_SCHEMES)}"
+        )
+        return None
+    
+    # Return None if no scheme in URL. Can't choose how to proceed
+    if not ".git" in parsed_wf_url.path:
+        logger.info(
+            f"URL does not seem to point to a git repo."
         )
         return None
 

@@ -105,6 +105,18 @@ from wfexs_backend.fetchers.git import guess_git_repo_params
             "git@github.com:inab/WfExS-backend.git",
             None,
         ),
+        (
+            "ssh://git@github.com:inab/WfExS-backend",
+            None,
+        ),
+        (
+            "https://github.com/inab/WfExS-backend",
+            None,
+        ),
+        (
+            "file:///inab/WfExS-backend",
+            None,
+        ),
     ],
 )
 def test_guess_git_repo_params(url, expected):
