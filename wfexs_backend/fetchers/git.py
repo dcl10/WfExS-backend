@@ -396,13 +396,6 @@ def guess_git_repo_params(
             f"No scheme in repo URL. Choices are: {', '.join(GIT_SCHEMES)}"
         )
         return None
-    
-    # Return None if no scheme in URL. Can't choose how to proceed
-    if not ".git" in parsed_wf_url.path:
-        logger.debug(
-            f"URL does not seem to point to a git repo."
-        )
-        return None
 
     # Getting the scheme git is going to understand
     git_scheme = parsed_wf_url.scheme.removeprefix("git+")
