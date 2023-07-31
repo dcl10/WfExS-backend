@@ -66,7 +66,6 @@ if TYPE_CHECKING:
 from urllib import parse, request
 
 import dulwich.porcelain
-import git
 
 from . import (
     AbstractRepoFetcher,
