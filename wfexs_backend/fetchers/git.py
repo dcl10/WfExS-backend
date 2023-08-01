@@ -380,7 +380,7 @@ def guess_git_repo_params(
     if no repo was found.
     """
     repoURL = None
-    repoTag: "Optional[RepoTag]" = None
+    repoTag = None
     repoRelPath = None
     repoType: "Optional[RepoType]" = RepoType.Git
 
