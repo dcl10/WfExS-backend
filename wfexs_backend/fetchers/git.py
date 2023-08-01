@@ -380,7 +380,7 @@ def guess_git_repo_params(
     if no repo was found.
     """
     repoURL = None
-    repoTag = None
+    repoTag: "Optional[RepoTag]" = None
     repoRelPath = None
     repoType: "Optional[RepoType]" = RepoType.Git
 
@@ -426,7 +426,7 @@ def guess_git_repo_params(
 
     return RemoteRepo(
         repo_url=cast("RepoURL", repoURL),
-        tag=cast("Optional[RepoTag]", repoTag),
+        tag=repoTag,
         rel_path=cast("Optional[RelPath]", repoRelPath),
         repo_type=repoType,
     )
