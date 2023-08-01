@@ -1543,7 +1543,7 @@ class WfExSBackend:
             # It could be even empty!
             if repoRelPath == "":
                 repoRelPath = None
-            self.logger.debug(f"guessedRepo: {guessedRepo}, {type(guessedRepo.tag)}")
+
             repoDir, repoEffectiveCheckout = self.doMaterializeRepo(
                 guessedRepo,
                 doUpdate=ignoreCache,
