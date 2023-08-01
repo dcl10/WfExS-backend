@@ -192,7 +192,7 @@ class GitFetcher(AbstractRepoFetcher):
         elif doUpdate:
             gitclone_params = None
             gitcheckout_params = [self.git_cmd, "pull", "--recurse-submodules"]
-            if repoTag is not None:
+            if repoTag is not None or repoTag == "None":
                 gitcheckout_params.extend(["origin", repoTag])
         else:
             doRepoUpdate = False
