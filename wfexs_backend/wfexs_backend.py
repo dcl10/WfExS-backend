@@ -1475,6 +1475,7 @@ class WfExSBackend:
 
             # Trying to be smarter
             guessedRepo = self.guess_repo_params(parsedRepoURL, fail_ok=True)
+            self.logger.debug(f"guessedRepo.tag: {guessedRepo.tag}, {type(guessedRepo.tag)}")
 
             if guessedRepo is not None:
                 if guessedRepo.tag is None and version_id is not None:
