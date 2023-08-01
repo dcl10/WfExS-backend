@@ -165,7 +165,6 @@ class GitFetcher(AbstractRepoFetcher):
         doRepoUpdate = True
         if not os.path.exists(os.path.join(repo_tag_destdir, ".git")):
             # Try cloning the repository without initial checkout
-            self.logger.debug(f"repoTag: {repoTag}, type: {type(repoTag)}")
             if repoTag is not None:
                 gitclone_params = [
                     self.git_cmd,

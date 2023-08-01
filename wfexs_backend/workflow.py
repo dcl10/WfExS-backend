@@ -1100,7 +1100,6 @@ class WF:
 
         assert self.metaDir is not None
 
-        self.logger.debug(f"fetchWorkflow version_id: {version_id}, {type(version_id)}")
         repoDir, repo, engineDesc, repoEffectiveCheckout = self.wfexs.cacheWorkflow(
             workflow_id=workflow_id,
             version_id=version_id,
@@ -1201,7 +1200,6 @@ class WF:
         # The engine is populated by self.fetchWorkflow()
         if self.engine is None:
             assert self.id is not None
-            self.logger.debug(f"setupEngine version_id: {self.version_id}, {type(self.version_id)}")
             self.fetchWorkflow(
                 self.id,
                 self.version_id,
