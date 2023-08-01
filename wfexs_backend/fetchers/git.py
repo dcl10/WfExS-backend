@@ -425,7 +425,7 @@ def guess_git_repo_params(
 
     return RemoteRepo(
         repo_url=cast("RepoURL", repoURL),
-        tag=cast("Optional[RelPath]", repoTag),
+        tag=cast("Optional[RepoTag]", repoTag),
         rel_path=cast("Optional[RelPath]", repoRelPath),
         repo_type=repoType,
     )

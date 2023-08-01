@@ -79,7 +79,6 @@ from wfexs_backend.fetchers.git import guess_git_repo_params
             RemoteRepo(
                 repo_url="file:///inab/WfExS-backend/.git",
                 repo_type=RepoType.Git,
-                tag=None
             ),
         ),
         (
