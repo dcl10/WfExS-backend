@@ -1061,7 +1061,7 @@ STDERR
                                     self.logger.debug(f"using podman")
                                     cmd_arr.extend(
                                         [
-                                            "--disable-pull",
+                                            # "--disable-pull",
                                             "--podman",
                                         ]
                                     )
