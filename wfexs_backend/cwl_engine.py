@@ -1062,7 +1062,7 @@ STDERR
                                     cmd_arr.extend(
                                         [
                                             "--disable-pull",
-                                            "--user-space-docker-cmd=/usr/bin/docker",
+                                            "--no-container",
                                             "--podman",
                                         ]
                                     )
