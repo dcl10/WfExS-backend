@@ -1047,7 +1047,6 @@ STDERR
                                 == ContainerType.Podman
                             ):
                                 if engineVersion < self.PODMAN_CWLTOOL_VERSION:
-                                    self.logger.debug(f"using user space docker")
                                     if self.container_factory.supportsFeature("userns"):
                                         instEnv["PODMAN_USERNS"] = "keep-id"
                                     cmd_arr.extend(
@@ -1058,10 +1057,9 @@ STDERR
                                         ]
                                     )
                                 else:
-                                    self.logger.debug(f"using podman")
                                     cmd_arr.extend(
                                         [
-                                            "--disable-pull",
+                                            # "--disable-pull",
                                             "--podman",
                                         ]
                                     )
