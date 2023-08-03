@@ -1062,7 +1062,6 @@ STDERR
                                     cmd_arr.extend(
                                         [
                                             "--disable-pull",
-                                            "--no-container",
                                             "--podman",
                                         ]
                                     )
