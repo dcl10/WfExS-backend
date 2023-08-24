@@ -270,7 +270,7 @@ class WfExSBackend:
         if workDir:
             if not os.path.isabs(workDir):
                 workDir = os.path.normpath(os.path.join(config_directory, workDir))
-            os.makedirs(workDir, exist_ok=True)
+            os.makedirs(workDir, mode=0o777, exist_ok=True)
 
         # Now, checking whether public and private key pairs exist
         numExist = 0
@@ -521,7 +521,7 @@ class WfExSBackend:
         if cacheDir:
             if not os.path.isabs(cacheDir):
                 cacheDir = os.path.normpath(os.path.join(config_directory, cacheDir))
-            os.makedirs(cacheDir, exist_ok=True)
+            os.makedirs(cacheDir, mode=0o777, exist_ok=True)
         else:
             cacheDir = tempfile.mkdtemp(prefix="WfExS", suffix="backend")
             # Assuring this temporal directory is removed at the end
@@ -531,19 +531,19 @@ class WfExSBackend:
         self.cacheDir = cacheDir
         self.cachePathMap: "MutableMapping[str, AbsPath]" = dict()
         cacheWorkflowDir = cast("AbsPath", os.path.join(cacheDir, "wf-cache"))
-        os.makedirs(cacheWorkflowDir, exist_ok=True)
+        os.makedirs(cacheWorkflowDir, mode=0o777, exist_ok=True)
         self.cachePathMap[CacheType.Workflow] = cacheWorkflowDir
 
         cacheROCrateDir = cast("AbsPath", os.path.join(cacheDir, "ro-crate-cache"))
-        os.makedirs(cacheROCrateDir, exist_ok=True)
+        os.makedirs(cacheROCrateDir, mode=0o777, exist_ok=True)
         self.cachePathMap[CacheType.ROCrate] = cacheROCrateDir
 
         cacheTRSFilesDir = cast("AbsPath", os.path.join(cacheDir, "trs-files-cache"))
-        os.makedirs(cacheTRSFilesDir, exist_ok=True)
+        os.makedirs(cacheTRSFilesDir, mode=0o777, exist_ok=True)
         self.cachePathMap[CacheType.TRS] = cacheTRSFilesDir
 
         cacheWorkflowInputsDir = cast("AbsPath", os.path.join(cacheDir, "wf-inputs"))
-        os.makedirs(cacheWorkflowInputsDir, exist_ok=True)
+        os.makedirs(cacheWorkflowInputsDir, mode=0o777, exist_ok=True)
         self.cachePathMap[CacheType.Input] = cacheWorkflowInputsDir
 
         # This directory will be used to store the intermediate
@@ -554,7 +554,7 @@ class WfExSBackend:
                 baseWorkDir = os.path.normpath(
                     os.path.join(config_directory, baseWorkDir)
                 )
-            os.makedirs(baseWorkDir, exist_ok=True)
+            os.makedirs(baseWorkDir, mode=0o777, exist_ok=True)
         else:
             baseWorkDir = tempfile.mkdtemp(prefix="WfExS-workdir", suffix="backend")
             # Assuring this temporal directory is removed at the end
@@ -825,7 +825,7 @@ class WfExSBackend:
                     f"Creation of {uniqueRawWorkDir} is not allowed by parameter"
                 )
 
-            os.makedirs(uniqueRawWorkDir, exist_ok=True)
+            os.makedirs(uniqueRawWorkDir, mode=0o777, exist_ok=True)
             if instanceId is None:
                 instanceId = cast("WfExSInstanceId", os.path.basename(uniqueRawWorkDir))
             if nickname is None:
@@ -1578,7 +1578,7 @@ class WfExSBackend:
             atexit.register(shutil.rmtree, meta_dir)
         else:
             # Assuring the destination directory does exist
-            os.makedirs(meta_dir, exist_ok=True)
+            os.makedirs(meta_dir, mode=0o777, exist_ok=True)
 
         if isinstance(workflow_id, int):
             workflow_id_str = str(workflow_id)
