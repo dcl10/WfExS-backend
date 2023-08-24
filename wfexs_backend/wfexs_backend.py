@@ -554,7 +554,7 @@ class WfExSBackend:
                 baseWorkDir = os.path.normpath(
                     os.path.join(config_directory, baseWorkDir)
                 )
-            os.makedirs(baseWorkDir, exist_ok=True)
+            os.makedirs(baseWorkDir, mode=0o777,exist_ok=True)
         else:
             baseWorkDir = tempfile.mkdtemp(prefix="WfExS-workdir", suffix="backend")
             # Assuring this temporal directory is removed at the end
@@ -825,7 +825,7 @@ class WfExSBackend:
                     f"Creation of {uniqueRawWorkDir} is not allowed by parameter"
                 )
 
-            os.makedirs(uniqueRawWorkDir, exist_ok=True)
+            os.makedirs(uniqueRawWorkDir, mode=0o777,exist_ok=True)
             if instanceId is None:
                 instanceId = cast("WfExSInstanceId", os.path.basename(uniqueRawWorkDir))
             if nickname is None:
@@ -1578,7 +1578,7 @@ class WfExSBackend:
             atexit.register(shutil.rmtree, meta_dir)
         else:
             # Assuring the destination directory does exist
-            os.makedirs(meta_dir, exist_ok=True)
+            os.makedirs(meta_dir, mode=0o777,exist_ok=True)
 
         if isinstance(workflow_id, int):
             workflow_id_str = str(workflow_id)
