@@ -250,7 +250,7 @@ def fetchOSFIO(
     # Now, let's materialize the files
     try:
         if kind == ContentKind.Directory:
-            os.makedirs(cachedFilename, exist_ok=True)
+            os.makedirs(cachedFilename, mode=0o755, exist_ok=True)
             for the_file in the_files:
                 relpath = the_file["attributes"]["materialized_path"].lstrip("/")
                 last_slash = relpath.rfind("/")
@@ -258,7 +258,7 @@ def fetchOSFIO(
                     the_file_local_dir = os.path.join(
                         cachedFilename, relpath[0:last_slash]
                     )
-                    os.makedirs(the_file_local_dir, exist_ok=True)
+                    os.makedirs(the_file_local_dir, mode=0o755, exist_ok=True)
 
                 the_file_local_path = cast(
                     "AbsPath", os.path.join(cachedFilename, relpath)

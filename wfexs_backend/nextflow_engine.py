@@ -279,13 +279,13 @@ class NextflowWorkflowEngine(WorkflowEngine):
 
         # Setting the assets directory
         self.nxf_assets = os.path.join(self.engineTweaksDir, "assets")
-        os.makedirs(self.nxf_assets, exist_ok=True)
+        os.makedirs(self.nxf_assets, mode=0o755, exist_ok=True)
 
         # Setting up packed directory
         self.groovy_cache_dir = os.path.join(
             self.cacheWorkflowDir, "groovy-parsing-cache"
         )
-        os.makedirs(self.groovy_cache_dir, exist_ok=True)
+        os.makedirs(self.groovy_cache_dir, mode=0o755, exist_ok=True)
 
     @classmethod
     def MyWorkflowType(cls) -> "WorkflowType":
@@ -766,7 +766,7 @@ class NextflowWorkflowEngine(WorkflowEngine):
             )
         cachedScript = cast("AbsPath", os.path.join(nextflow_install_dir, "nextflow"))
         if not os.path.exists(cachedScript):
-            os.makedirs(nextflow_install_dir, exist_ok=True)
+            os.makedirs(nextflow_install_dir, mode=0o755, exist_ok=True)
             nextflow_script_url = cast(
                 "URIType",
                 "https://github.com/nextflow-io/nextflow/releases/download/v{0}/nextflow-{0}-all".format(
@@ -976,7 +976,7 @@ class NextflowWorkflowEngine(WorkflowEngine):
                         else self.workDir,
                     )
                 else:
-                    os.makedirs(workdir, exist_ok=True)
+                    os.makedirs(workdir, mode=0o755, exist_ok=True)
             except Exception as error:
                 raise WorkflowEngineException(
                     "ERROR: Unable to create nextflow working directory. Error: "
@@ -998,7 +998,7 @@ class NextflowWorkflowEngine(WorkflowEngine):
             nxf_assets_dir = self.nxf_assets
             try:
                 # Directories required by Nextflow in a Docker
-                os.makedirs(nxf_assets_dir, exist_ok=True)
+                os.makedirs(nxf_assets_dir, mode=0o755, exist_ok=True)
             except Exception as error:
                 raise WorkflowEngineException(
                     "ERROR: Unable to create nextflow assets directory. Error: "
@@ -1535,14 +1535,14 @@ STDERR
 
         outputDirPostfix = "_" + str(int(time.time()))
         outputsDir = cast("AbsPath", os.path.join(self.outputsDir, outputDirPostfix))
-        os.makedirs(outputsDir, exist_ok=True)
+        os.makedirs(outputsDir, mode=0o755, exist_ok=True)
 
         # These declarations provide a separate metadata directory for
         # each one of the executions of Nextflow
         outputMetaDir = os.path.join(self.outputMetaDir, outputDirPostfix)
-        os.makedirs(outputMetaDir, exist_ok=True)
+        os.makedirs(outputMetaDir, mode=0o755, exist_ok=True)
         outputStatsDir = os.path.join(outputMetaDir, WORKDIR_STATS_RELDIR)
-        os.makedirs(outputStatsDir, exist_ok=True)
+        os.makedirs(outputStatsDir, mode=0o755, exist_ok=True)
 
         timelineFile = os.path.join(outputStatsDir, "timeline.html")
         reportFile = os.path.join(outputStatsDir, "report.html")

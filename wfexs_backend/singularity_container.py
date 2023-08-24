@@ -132,7 +132,7 @@ class SingularityContainerFactory(ContainerFactory):
         # This is needed due a bug in singularity 3.6, where
         # singularity pull --disable-cache does not create a container
         singularityCacheDir = os.path.join(self.containersCacheDir, ".singularity")
-        os.makedirs(singularityCacheDir, exist_ok=True)
+        os.makedirs(singularityCacheDir, mode=0o755, exist_ok=True)
 
         self._environment.update(
             {
@@ -645,7 +645,7 @@ STDERR
                 containerPathMeta = cast(
                     "AbsPath", os.path.join(containers_dir, containerFilenameMeta)
                 )
-                os.makedirs(containers_dir, exist_ok=True)
+                os.makedirs(containers_dir, mode=0o755, exist_ok=True)
                 if force or not os.path.exists(containerPath):
                     link_or_copy(localContainerPath, containerPath)
                 if force or not os.path.exists(containerPathMeta):

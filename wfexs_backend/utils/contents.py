@@ -254,7 +254,7 @@ def link_or_copy(src: "AnyPath", dest: "AnyPath", force_copy: "bool" = False) ->
     if not dest_exists:
         dest_parent = os.path.dirname(dest)
         if not os.path.isdir(dest_parent):
-            os.makedirs(dest_parent)
+            os.makedirs(dest_parent, mode=0o755)
 
     # Now, link or copy
     if os.lstat(src).st_dev == dest_st_dev and not force_copy:

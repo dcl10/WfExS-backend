@@ -680,7 +680,7 @@ if __name__ == "__main__":
     cache_directory = os.environ.get("GROOVY_CACHEDIR")
     if cache_directory is not None:
         print(f"* Using as caching directory {cache_directory}")
-        os.makedirs(cache_directory, exist_ok=True)
+        os.makedirs(cache_directory, mode=0o755, exist_ok=True)
     else:
         print(
             "[WARNING] No caching is done. If you want to cache parsed content declare variable GROOVY_CACHEDIR"

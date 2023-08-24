@@ -282,7 +282,7 @@ class SchemeHandlerCacheHandler:
         hashDir = os.path.join(destdir, "uri_hashes")
         if not os.path.exists(hashDir):
             try:
-                os.makedirs(hashDir)
+                os.makedirs(hashDir, mode=0o755)
             except IOError:
                 errstr = "ERROR: Unable to create directory for workflow URI hashes {}.".format(
                     hashDir
@@ -823,7 +823,7 @@ class SchemeHandlerCacheHandler:
         # The directory with the content, whose name is based on sha256
         if not os.path.exists(destdir):
             try:
-                os.makedirs(destdir)
+                os.makedirs(destdir, mode=0o755)
             except IOError:
                 errstr = (
                     "ERROR: Unable to create directory for workflow inputs {}.".format(

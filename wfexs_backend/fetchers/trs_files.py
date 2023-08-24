@@ -190,7 +190,7 @@ def fetchTRSFiles(
             )
         ) from he
 
-    os.makedirs(cachedFilename, exist_ok=True)
+    os.makedirs(cachedFilename, mode=0o755, exist_ok=True)
     absdirs = set()
     emptyWorkflow = True
     # First pass, identify primary descriptor / workflow entrypoint
@@ -260,7 +260,7 @@ def fetchTRSFiles(
             absdir = os.path.dirname(absfile)
             if absdir not in absdirs:
                 absdirs.add(absdir)
-                os.makedirs(absdir, exist_ok=True)
+                os.makedirs(absdir, mode=0o755, exist_ok=True)
             real_rel_path = os.path.relpath(os.path.normpath(absfile), cachedFilename)
 
             # When it is the primary descriptor, it is fetched twice

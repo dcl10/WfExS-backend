@@ -288,7 +288,7 @@ class FTPDownloader:
     ) -> "Sequence[Path]":
         dfdPath = Path(download_from_dir)
         destdir = os.path.abspath(upload_to_dir)
-        os.makedirs(destdir, exist_ok=True)
+        os.makedirs(destdir, mode=0o755, exist_ok=True)
         utdPath = Path(destdir)
 
         client: aioftp.Client
@@ -343,7 +343,7 @@ class FTPDownloader:
             dfdStat = await client.stat(dfdPath)
             retval: "Union[Path, Sequence[Path]]"
             if dfdStat["type"] == "dir":
-                os.makedirs(destpath, exist_ok=True)
+                os.makedirs(destpath, mode=0o755, exist_ok=True)
                 retval = await self._download_dir_async(
                     client, dfdPath, utdPath, exclude_ext
                 )

@@ -243,7 +243,7 @@ class CWLWorkflowEngine(WorkflowEngine):
 
         # Setting up packed directory
         self.cacheWorkflowPackDir = os.path.join(self.cacheWorkflowDir, "wf-pack")
-        os.makedirs(self.cacheWorkflowPackDir, exist_ok=True)
+        os.makedirs(self.cacheWorkflowPackDir, mode=0o755, exist_ok=True)
 
     @classmethod
     def MyWorkflowType(cls) -> "WorkflowType":
@@ -951,9 +951,9 @@ STDERR
             outputsDir = cast(
                 "AbsPath", os.path.join(self.outputsDir, outputDirPostfix)
             )
-            os.makedirs(outputsDir, exist_ok=True)
+            os.makedirs(outputsDir, mode=0o755, exist_ok=True)
             outputMetaDir = os.path.join(self.outputMetaDir, outputDirPostfix)
-            os.makedirs(outputMetaDir, exist_ok=True)
+            os.makedirs(outputMetaDir, mode=0o755, exist_ok=True)
             try:
                 # Create YAML file
                 augmentedInputs = self.createYAMLFile(

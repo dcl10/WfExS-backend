@@ -530,25 +530,25 @@ class WF:
             self.inputsDir = cast(
                 "AbsPath", os.path.join(self.workDir, WORKDIR_INPUTS_RELDIR)
             )
-            os.makedirs(self.inputsDir, exist_ok=True)
+            os.makedirs(self.inputsDir, mode=0o755, exist_ok=True)
             # This directory should hold intermediate workflow steps results
             self.intermediateDir = cast(
                 "AbsPath", os.path.join(self.workDir, WORKDIR_INTERMEDIATE_RELDIR)
             )
-            os.makedirs(self.intermediateDir, exist_ok=True)
+            os.makedirs(self.intermediateDir, mode=0o755, exist_ok=True)
             # This directory will hold the final workflow results, which could
             # be either symbolic links to the intermediate results directory
             # or newly generated content
             self.outputsDir = cast(
                 "AbsPath", os.path.join(self.workDir, WORKDIR_OUTPUTS_RELDIR)
             )
-            os.makedirs(self.outputsDir, exist_ok=True)
+            os.makedirs(self.outputsDir, mode=0o755, exist_ok=True)
             # This directory is here for those files which are created in order
             # to tweak or patch workflow executions
             self.engineTweaksDir = cast(
                 "AbsPath", os.path.join(self.workDir, WORKDIR_ENGINE_TWEAKS_RELDIR)
             )
-            os.makedirs(self.engineTweaksDir, exist_ok=True)
+            os.makedirs(self.engineTweaksDir, mode=0o755, exist_ok=True)
             # This directory will hold metadata related to the execution
             self.metaDir = cast(
                 "AbsPath", os.path.join(self.workDir, WORKDIR_META_RELDIR)
@@ -583,7 +583,7 @@ class WF:
                         self.workflow_config = None
                         # self.marshallConfig(overwrite=False)
             else:
-                os.makedirs(self.metaDir, exist_ok=True)
+                os.makedirs(self.metaDir, mode=0o755, exist_ok=True)
                 self.marshallConfig(overwrite=True)
                 is_damaged = False
         else:
@@ -716,8 +716,8 @@ class WF:
             uniqueWorkDir = cast("AbsPath", os.path.join(uniqueRawWorkDir, "work"))
 
             # The directories should exist before calling encryption FS mount
-            os.makedirs(uniqueEncWorkDir, exist_ok=True)
-            os.makedirs(uniqueWorkDir, exist_ok=True)
+            os.makedirs(uniqueEncWorkDir, mode=0o755, exist_ok=True)
+            os.makedirs(uniqueWorkDir, mode=0o755, exist_ok=True)
 
             # This is the passphrase needed to decrypt the filesystem
             passphraseFile = cast(
@@ -773,7 +773,7 @@ class WF:
                                 uniqueWorkDir,
                                 uniqueWorkDir + "_tainted_" + str(time.time()),
                             )
-                            os.makedirs(uniqueWorkDir, exist_ok=True)
+                            os.makedirs(uniqueWorkDir, mode=0o755, exist_ok=True)
                             break
 
                 # We are going to unmount what we have mounted
@@ -813,7 +813,7 @@ class WF:
                         base_keys_dir = os.path.join(
                             uniqueWorkDir, "meta", "public_keys"
                         )
-                        os.makedirs(base_keys_dir, exist_ok=True)
+                        os.makedirs(base_keys_dir, mode=0o755, exist_ok=True)
                         key_fns: "MutableSequence[str]" = []
                         manifest = {
                             "creation": datetime.datetime.now(
@@ -1143,7 +1143,7 @@ class WF:
             if os.path.isdir(repoDir):
                 link_or_copy(repoDir, self.workflowDir, force_copy=True)
             else:
-                os.makedirs(self.workflowDir, exist_ok=True)
+                os.makedirs(self.workflowDir, mode=0o755, exist_ok=True)
                 if self.repoRelPath is None:
                     self.repoRelPath = cast("RelPath", "workflow.entrypoint")
                 link_or_copy(
@@ -1822,7 +1822,7 @@ class WF:
                             autoFilledDir = os.path.dirname(autoFilledFile)
                             # This is needed to assure the path exists
                             if autoFilledDir != self.outputsDir:
-                                os.makedirs(autoFilledDir, exist_ok=True)
+                                os.makedirs(autoFilledDir, mode=0o755, exist_ok=True)
 
                             theInputs.append(
                                 MaterializedInput(
@@ -1954,7 +1954,9 @@ class WF:
                                     os.path.join(inputDestDir, *linearKey.split(".")),
                                 )
                                 os.makedirs(
-                                    os.path.dirname(inputDestPath), exist_ok=True
+                                    os.path.dirname(inputDestPath),
+                                    mode=0o755,
+                                    exist_ok=True
                                 )
                                 # Creating the empty file
                                 with open(inputDestPath, mode="wb") as idH:

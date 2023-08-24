@@ -122,7 +122,11 @@ def downloadContentFrom_s3(
                         local_path, key["Key"][len(blob_prefix) :]
                     )
                     try:
-                        os.makedirs(os.path.dirname(local_blob_filename), exist_ok=True)
+                        os.makedirs(
+                            os.path.dirname(local_blob_filename),
+                            mode=0o755,
+                            exist_ok=True
+                        )
                         s3cli.download_file(bucket, key["Key"], local_blob_filename)
                         metadata_payload.append(key)
                     except Exception as e:

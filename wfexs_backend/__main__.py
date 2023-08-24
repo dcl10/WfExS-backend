@@ -1002,7 +1002,7 @@ def main() -> None:
     # In any case, assuring the cache directory does exist
     cacheDir = local_config.get("cacheDir")
     if cacheDir:
-        os.makedirs(cacheDir, exist_ok=True)
+        os.makedirs(cacheDir, mode=0o755, exist_ok=True)
     else:
         cacheDir = tempfile.mkdtemp(prefix="wfexs", suffix="tmpcache")
         local_config["cacheDir"] = cacheDir

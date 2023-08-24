@@ -109,7 +109,7 @@ def sftpCopy(
             kind = ContentKind.File
         elif stat.S_ISDIR(sshStat.st_mode):
             # Recursive
-            os.makedirs(localPath, exist_ok=True)
+            os.makedirs(localPath, mode=0o755, exist_ok=True)
             recur = []
             # List of remote files
             for filename in sftp.listdir(sshPath):

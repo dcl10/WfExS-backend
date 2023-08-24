@@ -147,7 +147,7 @@ class GitFetcher(AbstractRepoFetcher):
 
                 if not os.path.exists(repo_destdir):
                     try:
-                        os.makedirs(repo_destdir)
+                        os.makedirs(repo_destdir, mode=0o755)
                     except IOError:
                         errstr = "ERROR: Unable to create intermediate directories for repo {}. ".format(
                             repoURL

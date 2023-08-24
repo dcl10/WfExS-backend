@@ -284,7 +284,7 @@ def writeWorkflowConfigVariations(
 ) -> Sequence[str]:
     # Creating the directory, in case it does not exist
     destdir = os.path.abspath(args.destdir)
-    os.makedirs(destdir, exist_ok=True)
+    os.makedirs(destdir, mode=0o755, exist_ok=True)
 
     createdConfigurationFiles = []
     paramSymbolPath = None

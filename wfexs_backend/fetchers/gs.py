@@ -129,7 +129,7 @@ def downloadContentFrom_gs(
                 local_path, blob.name[len(blob_prefix) :]
             )
             try:
-                os.makedirs(os.path.dirname(local_blob_filename), exist_ok=True)
+                os.makedirs(os.path.dirname(local_blob_filename), mode=0o755, exist_ok=True)
                 blob.download_to_filename(local_blob_filename)
                 metadata_payload.append(blob.metadata)
             except Exception as e:

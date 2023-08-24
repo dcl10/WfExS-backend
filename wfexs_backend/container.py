@@ -123,7 +123,7 @@ class ContainerFactory(abc.ABC):
         if cacheDir is None:
             cacheDir = local_config.get("cacheDir")
             if cacheDir:
-                os.makedirs(cacheDir, exist_ok=True)
+                os.makedirs(cacheDir, mode=0o755, exist_ok=True)
             else:
                 cacheDir = cast(
                     "AbsPath", tempfile.mkdtemp(prefix="wfexs", suffix="backend")
@@ -150,7 +150,7 @@ class ContainerFactory(abc.ABC):
         self.engineContainersSymlinkDir = cast(
             "AbsPath", os.path.join(self.containersCacheDir, engine_name)
         )
-        os.makedirs(self.engineContainersSymlinkDir, exist_ok=True)
+        os.makedirs(self.engineContainersSymlinkDir, mode=0o755, exist_ok=True)
 
         # This variable contains the dictionary of set up environment
         # variables needed to run the tool with the proper setup

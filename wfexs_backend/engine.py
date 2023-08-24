@@ -208,7 +208,7 @@ class WorkflowEngine(AbstractWorkflowEngineType):
                     os.path.normpath(os.path.join(config_directory, cacheDir)),
                 )
             # Be sure the directory exists
-            os.makedirs(cacheDir, exist_ok=True)
+            os.makedirs(cacheDir, mode=0o755, exist_ok=True)
 
         # We are using as our own caching directory one located at the
         # generic caching directory, with the name of the class
@@ -218,7 +218,7 @@ class WorkflowEngine(AbstractWorkflowEngineType):
         # Needed for those cases where alternate version of the workflow is generated
         if cacheWorkflowDir is None:
             cacheWorkflowDir = cast("AbsPath", os.path.join(cacheDir, "wf-cache"))
-            os.makedirs(cacheWorkflowDir, exist_ok=True)
+            os.makedirs(cacheWorkflowDir, mode=0o755, exist_ok=True)
         self.cacheWorkflowDir = cacheWorkflowDir
 
         # Needed for those cases where there is a shared cache
@@ -226,7 +226,7 @@ class WorkflowEngine(AbstractWorkflowEngineType):
             cacheWorkflowInputsDir = cast(
                 "AbsPath", os.path.join(cacheDir, "wf-inputs")
             )
-            os.makedirs(cacheWorkflowInputsDir, exist_ok=True)
+            os.makedirs(cacheWorkflowInputsDir, mode=0o755, exist_ok=True)
         self.cacheWorkflowInputsDir = cacheWorkflowInputsDir
 
         # Setting up working directories, one per instance
@@ -243,7 +243,7 @@ class WorkflowEngine(AbstractWorkflowEngineType):
             intermediateDir = cast(
                 "AbsPath", os.path.join(workDir, WORKDIR_INTERMEDIATE_RELDIR)
             )
-        os.makedirs(intermediateDir, exist_ok=True)
+        os.makedirs(intermediateDir, mode=0o755, exist_ok=True)
         self.intermediateDir = intermediateDir
 
         # This directory will hold the final workflow results, which could
@@ -253,7 +253,7 @@ class WorkflowEngine(AbstractWorkflowEngineType):
             outputsDir = cast("AbsPath", os.path.join(workDir, WORKDIR_OUTPUTS_RELDIR))
         elif not os.path.isabs(outputsDir):
             outputsDir = cast("AbsPath", os.path.abspath(outputsDir))
-        os.makedirs(outputsDir, exist_ok=True)
+        os.makedirs(outputsDir, mode=0o755, exist_ok=True)
         self.outputsDir = cast("AbsPath", outputsDir)
 
         # This directory will hold diverse metadata, like execution metadata
@@ -263,7 +263,7 @@ class WorkflowEngine(AbstractWorkflowEngineType):
                 "AbsPath",
                 os.path.join(workDir, WORKDIR_META_RELDIR, WORKDIR_OUTPUTS_RELDIR),
             )
-        os.makedirs(outputMetaDir, exist_ok=True)
+        os.makedirs(outputMetaDir, mode=0o755, exist_ok=True)
         self.outputMetaDir = outputMetaDir
 
         # This directory will hold stats metadata, as well as the dot representation
@@ -271,7 +271,7 @@ class WorkflowEngine(AbstractWorkflowEngineType):
         outputStatsDir = cast(
             "AbsPath", os.path.join(outputMetaDir, WORKDIR_STATS_RELDIR)
         )
-        os.makedirs(outputStatsDir, exist_ok=True)
+        os.makedirs(outputStatsDir, mode=0o755, exist_ok=True)
         self.outputStatsDir = outputStatsDir
 
         # This directory is here for those files which are created in order
@@ -281,7 +281,7 @@ class WorkflowEngine(AbstractWorkflowEngineType):
             engineTweaksDir = cast(
                 "AbsPath", os.path.join(workDir, WORKDIR_ENGINE_TWEAKS_RELDIR)
             )
-        os.makedirs(engineTweaksDir, exist_ok=True)
+        os.makedirs(engineTweaksDir, mode=0o755, exist_ok=True)
         self.engineTweaksDir = engineTweaksDir
 
         # This directory is here for temporary files of any program launched from
